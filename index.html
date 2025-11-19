@@ -34,20 +34,20 @@
             text-align: center;
         }
 
-        .theme-toggle {
+        .theme-btn {
             position: fixed;
             top: 12px;
             right: 12px;
-            background: var(--btn);
+            background: transparent;
             border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
+            font-size: 26px;
             cursor: pointer;
-            font-weight: bold;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: var(--text);
+            transition: 0.3s;
+        }
+
+        .theme-btn:hover {
+            opacity: 0.7;
         }
 
         .container {
@@ -109,8 +109,10 @@
             text-align: center;
         }
 
-        .copy-btn {
-            margin-top: 15px;
+        .copy-btn,
+        .download-btn,
+        .convert-btn {
+            margin-top: 12px;
             width: 100%;
             background: var(--btn);
             border: none;
@@ -122,8 +124,53 @@
             font-weight: bold;
         }
 
-        .copy-btn:hover {
-            opacity: 0.85;
+        /* UPDATED SECTION */
+        .convert-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .numeric-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #666;
+            background: var(--card);
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .convert-btn {
+            width: 160px;
+            background: var(--btn);
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                flex-direction: column;
+                text-align: center;
+            }
+            .options {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .convert-container {
+                flex-direction: column;
+            }
+
+            .convert-btn {
+                width: 100%;
+            }
         }
 
         footer {
@@ -135,33 +182,16 @@
             line-height: 1.5;
             font-size: 15px;
         }
-
-        @media (max-width: 600px) {
-            .row {
-                flex-direction: column;
-                text-align: center;
-            }
-            .label, .options {
-                width: 100%;
-            }
-            .options {
-                margin-top: 10px;
-            }
-        }
     </style>
 </head>
 <body class="dark">
 
-<!-- Theme Toggle -->
-<button class="theme-toggle" onclick="toggleTheme()">
-    <span id="theme-icon">🌙</span>
-</button>
+<button class="theme-btn" id="themeIcon" onclick="toggleTheme()">🌙</button>
 
 <h2>Linux File Permission Calculator</h2>
 
 <div class="container">
 
-    <!-- Owner -->
     <div class="row">
         <div class="label">Owner</div>
         <div class="options">
@@ -171,7 +201,6 @@
         </div>
     </div>
 
-    <!-- Group -->
     <div class="row">
         <div class="label">Group</div>
         <div class="options">
@@ -181,7 +210,6 @@
         </div>
     </div>
 
-    <!-- Others -->
     <div class="row">
         <div class="label">Others</div>
         <div class="options">
@@ -191,19 +219,23 @@
         </div>
     </div>
 
-    <!-- Numeric Result -->
     <div class="result-box" id="result">Permission: 000</div>
 
-    <!-- Symbolic Result -->
     <div class="symbolic-box" id="symbolic">rwxrwxrwx</div>
 
-    <!-- Copy Button -->
     <button class="copy-btn" onclick="copyPermission()">Copy Numeric Permission</button>
+    <button class="download-btn" onclick="downloadPermission()">Download as File</button>
+
+    <!-- UPDATED INPUT + BUTTON -->
+    <div class="convert-container">
+        <input type="text" class="numeric-input" id="numericInput" placeholder="Enter permission (e.g. 755)">
+        <button class="convert-btn" onclick="convertBack()">Convert Back</button>
+    </div>
+
 </div>
 
-<!-- Footer -->
 <footer>
-<b>Chmod Calculator</b><br>
+<b>Linux File Permission Calculator</b><br>
 Linux Permission Calculator is a free utility to calculate the numeric (octal) or symbolic value for a set of file or folder permissions in Linux servers.<br><br>
 <b>How to use</b><br>
 Check the desired boxes or directly enter a valid numeric value (e.g. 777) or symbolic notation (e.g. rwxrwxrwx) to see its value in other formats.<br><br>
@@ -248,13 +280,46 @@ function copyPermission() {
     alert("Copied: " + text);
 }
 
+function downloadPermission() {
+    let value = document.getElementById("result").innerText.replace("Permission: ", "");
+    let symbolic = document.getElementById("symbolic").innerText;
+
+    let data = `Numeric: ${value}\nSymbolic: ${symbolic}`;
+    let blob = new Blob([data], { type: "text/plain" });
+
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `permission_${value}.txt`;
+    link.click();
+}
+
+function convertBack() {
+    let val = document.getElementById("numericInput").value.trim();
+    if (!/^[0-7]{3}$/.test(val)) {
+        alert("Please enter a valid 3-digit number like 755");
+        return;
+    }
+
+    let digits = val.split("");
+
+    function apply(selector, number) {
+        document.querySelector(`${selector}[value="4"]`).checked = number & 4;
+        document.querySelector(`${selector}[value="2"]`).checked = number & 2;
+        document.querySelector(`${selector}[value="1"]`).checked = number & 1;
+    }
+
+    apply(".owner", parseInt(digits[0]));
+    apply(".group", parseInt(digits[1]));
+    apply(".other", parseInt(digits[2]));
+
+    calculatePermission();
+}
+
 function toggleTheme() {
-    const body = document.body;
-    const icon = document.getElementById("theme-icon");
+    document.body.classList.toggle("light");
 
-    body.classList.toggle("light");
-
-    icon.textContent = body.classList.contains("light") ? "☀️" : "🌙";
+    let icon = document.getElementById("themeIcon");
+    icon.textContent = document.body.classList.contains("light") ? "☀️" : "🌙";
 }
 </script>
 
