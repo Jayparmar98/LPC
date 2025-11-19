@@ -2,70 +2,218 @@
 <html>
 <head>
     <title>Linux Numeric Permission Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <style>
+        :root {
+            --bg: #0d1117;
+            --card: #161b22;
+            --text: #fff;
+            --accent: #238636;
+            --btn: #2d72f5;
+        }
+
+        body.light {
+            --bg: #ffffff;
+            --card: #f5f5f5;
+            --text: #000;
+            --accent: #0a8f3c;
+            --btn: #0040ff;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: Poppins, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            margin: 0;
+            transition: 0.3s;
         }
-        table {
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #333;
-            padding: 8px 15px;
+
+        h2 {
             text-align: center;
         }
-        .result-box {
-            font-size: 20px;
-            margin-top: 10px;
+
+        .theme-toggle {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            background: var(--btn);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
             font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .container {
+            max-width: 620px;
+            background: var(--card);
+            margin: 60px auto 20px;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 10px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .label {
+            width: 25%;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .options {
+            width: 70%;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .option-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.3);
+            margin-top: 6px;
+            cursor: pointer;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            background: var(--accent);
+            padding: 14px;
+            text-align: center;
+            font-size: 22px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .symbolic-box {
+            margin-top: 15px;
+            background: #444;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .copy-btn {
+            margin-top: 15px;
+            width: 100%;
+            background: var(--btn);
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.85;
+        }
+
+        footer {
+            max-width: 620px;
+            margin: 15px auto;
+            padding: 15px;
+            background: var(--card);
+            border-radius: 10px;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .row {
+                flex-direction: column;
+                text-align: center;
+            }
+            .label, .options {
+                width: 100%;
+            }
+            .options {
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
-<body>
+<body class="dark">
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" onclick="toggleTheme()">
+    <span id="theme-icon">🌙</span>
+</button>
 
 <h2>Linux File Permission Calculator</h2>
 
-<table>
-    <tr>
-        <th>Category</th>
-        <th>Read (4)</th>
-        <th>Write (2)</th>
-        <th>Execute (1)</th>
-    </tr>
+<div class="container">
+
     <!-- Owner -->
-    <tr>
-        <td>Owner</td>
-        <td><input type="checkbox" class="owner" value="4" onchange="calculatePermission()"></td>
-        <td><input type="checkbox" class="owner" value="2" onchange="calculatePermission()"></td>
-        <td><input type="checkbox" class="owner" value="1" onchange="calculatePermission()"></td>
-    </tr>
+    <div class="row">
+        <div class="label">Owner</div>
+        <div class="options">
+            <div class="option-item">Read<br><input type="checkbox" class="owner" value="4" onchange="calculatePermission()"></div>
+            <div class="option-item">Write<br><input type="checkbox" class="owner" value="2" onchange="calculatePermission()"></div>
+            <div class="option-item">Execute<br><input type="checkbox" class="owner" value="1" onchange="calculatePermission()"></div>
+        </div>
+    </div>
 
     <!-- Group -->
-    <tr>
-        <td>Group</td>
-        <td><input type="checkbox" class="group" value="4" onchange="calculatePermission()"></td>
-        <td><input type="checkbox" class="group" value="2" onchange="calculatePermission()"></td>
-        <td><input type="checkbox" class="group" value="1" onchange="calculatePermission()"></td>
-    </tr>
+    <div class="row">
+        <div class="label">Group</div>
+        <div class="options">
+            <div class="option-item">Read<br><input type="checkbox" class="group" value="4" onchange="calculatePermission()"></div>
+            <div class="option-item">Write<br><input type="checkbox" class="group" value="2" onchange="calculatePermission()"></div>
+            <div class="option-item">Execute<br><input type="checkbox" class="group" value="1" onchange="calculatePermission()"></div>
+        </div>
+    </div>
 
     <!-- Others -->
-    <tr>
-        <td>Others</td>
-        <td><input type="checkbox" class="other" value="4" onchange="calculatePermission()"></td>
-        <td><input type="checkbox" class="other" value="2" onchange="calculatePermission()"></td>
-        <td><input type="checkbox" class="other" value="1" onchange="calculatePermission()"></td>
-    </tr>
-</table>
+    <div class="row">
+        <div class="label">Others</div>
+        <div class="options">
+            <div class="option-item">Read<br><input type="checkbox" class="other" value="4" onchange="calculatePermission()"></div>
+            <div class="option-item">Write<br><input type="checkbox" class="other" value="2" onchange="calculatePermission()"></div>
+            <div class="option-item">Execute<br><input type="checkbox" class="other" value="1" onchange="calculatePermission()"></div>
+        </div>
+    </div>
 
-<div class="result-box">
-    Permission: <span id="result">000</span>
+    <!-- Numeric Result -->
+    <div class="result-box" id="result">Permission: 000</div>
+
+    <!-- Symbolic Result -->
+    <div class="symbolic-box" id="symbolic">rwxrwxrwx</div>
+
+    <!-- Copy Button -->
+    <button class="copy-btn" onclick="copyPermission()">Copy Numeric Permission</button>
 </div>
+
+<!-- Footer -->
+<footer>
+<b>Chmod Calculator</b><br>
+Linux Permission Calculator is a free utility to calculate the numeric (octal) or symbolic value for a set of file or folder permissions in Linux servers.<br><br>
+<b>How to use</b><br>
+Check the desired boxes or directly enter a valid numeric value (e.g. 777) or symbolic notation (e.g. rwxrwxrwx) to see its value in other formats.<br><br>
+<b>File Permissions</b><br>
+File permissions in Linux file system are managed in three distinct user classes: user/owner, group and others/public. Each class can have read, write and execute permissions. File permission can be represented in a symbolic or numeric (octal) format.
+</footer>
 
 <script>
 function calculatePermission() {
-    function sumValues(selector) {
+    function getSum(selector) {
         let total = 0;
         document.querySelectorAll(selector).forEach(box => {
             if (box.checked) total += parseInt(box.value);
@@ -73,11 +221,40 @@ function calculatePermission() {
         return total;
     }
 
-    let owner = sumValues(".owner");
-    let group = sumValues(".group");
-    let other = sumValues(".other");
+    function getSymbolic(selector) {
+        let r = document.querySelector(`${selector}[value="4"]`).checked ? "r" : "-";
+        let w = document.querySelector(`${selector}[value="2"]`).checked ? "w" : "-";
+        let x = document.querySelector(`${selector}[value="1"]`).checked ? "x" : "-";
+        return r + w + x;
+    }
 
-    document.getElementById("result").innerText = `${owner}${group}${other}`;
+    let o = getSum(".owner");
+    let g = getSum(".group");
+    let t = getSum(".other");
+
+    document.getElementById("result").innerText = `Permission: ${o}${g}${t}`;
+
+    let symbolic =
+        getSymbolic(".owner") +
+        getSymbolic(".group") +
+        getSymbolic(".other");
+
+    document.getElementById("symbolic").innerText = symbolic;
+}
+
+function copyPermission() {
+    let text = document.getElementById("result").innerText.replace("Permission: ", "").trim();
+    navigator.clipboard.writeText(text);
+    alert("Copied: " + text);
+}
+
+function toggleTheme() {
+    const body = document.body;
+    const icon = document.getElementById("theme-icon");
+
+    body.classList.toggle("light");
+
+    icon.textContent = body.classList.contains("light") ? "☀️" : "🌙";
 }
 </script>
 
